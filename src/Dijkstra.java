@@ -39,7 +39,7 @@ public class Dijkstra {
         PriorityQueue<int[]> cola = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
         cola.offer(new int[]{0, origen});
 
-        // === Bucle principal de Dijkstra ===
+        // Bucle principal de Dijkstra
         while (!cola.isEmpty()) {
             int[] actual = cola.poll();
             int distActual = actual[0];
@@ -57,7 +57,7 @@ public class Dijkstra {
                 int vecino = arista.destino;
                 int nuevaDist = distActual + arista.distancia;
 
-                // Relajación: si encontramos un camino más corto, actualizamos
+                // Si encontramos un camino más corto, actualizamos
                 if (!visitado[vecino] && nuevaDist < dist[vecino]) {
                     dist[vecino] = nuevaDist;
                     predecesor[vecino] = nodoActual;
@@ -66,7 +66,7 @@ public class Dijkstra {
             }
         }
 
-        // === Reconstruir el camino desde destino hasta origen ===
+        // Reconstruir el camino desde destino hasta origen
         List<Integer> camino = new ArrayList<>();
         int nodo = destino;
 
@@ -81,7 +81,7 @@ public class Dijkstra {
         }
         Collections.reverse(camino); // Invertir para tener origen -> destino
 
-        // === Calcular víctimas recolectadas en el camino ===
+        // Calcular víctimas recolectadas en el camino
         // Las víctimas del nodo solo se suman la primera vez que se visita
         int totalVictimas = 0;
         Set<Integer> visitadosVictimas = new HashSet<>();
