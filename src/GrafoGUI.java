@@ -4,15 +4,7 @@ import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
 
-/**
- * Interfaz gráfica que visualiza el grafo y resalta los caminos calculados.
- * Usa Java Swing
- *
- * - Nodos se dibujan como círculos con su número y víctimas.
- * - Aristas se dibujan como flechas con la distancia.
- * - El camino de Dijkstra se resalta en AZUL.
- * - El camino de Bellman-Ford se resalta en ROJO.
- */
+// Ventana que dibuja el grafo y resalta los caminos de dijkstra y bellman-ford
 public class GrafoGUI extends JFrame {
 
     private Grafo grafo;
@@ -22,13 +14,8 @@ public class GrafoGUI extends JFrame {
     private int victDijkstra;
     private int distBellman;
     private int victBellman;
-
-    // Posiciones calculadas para cada nodo (para dibujar)
     private int[][] posiciones;
 
-    /**
-     * Constructor de la GUI.
-     */
     public GrafoGUI(Grafo grafo, List<Integer> caminoDijkstra, List<Integer> caminoBellmanFord,
                     int distDijkstra, int victDijkstra, int distBellman, int victBellman) {
         this.grafo = grafo;
@@ -41,16 +28,14 @@ public class GrafoGUI extends JFrame {
 
         calcularPosiciones();
 
-        setTitle("El Ritual de JohlodejVe - Visualización del Grafo");
+        setTitle("El Ritual de JohlodejVe - Visualizacion del Grafo");
         setSize(900, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(true);
     }
 
-    /**
-     * Distribuye los nodos en un círculo para visualización clara.
-     */
+    // poner los nodos en circulo para que se vean bien
     private void calcularPosiciones() {
         int n = grafo.getNumNodos();
         posiciones = new int[n][2];
@@ -70,11 +55,12 @@ public class GrafoGUI extends JFrame {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
 
+        // para que las lineas se vean suaves
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         int n = grafo.getNumNodos();
 
-        // === 1. Dibujar todas las aristas (gris claro) ===
+        // dibujar todas las aristas en gris
         for (Grafo.Arista arista : grafo.getTodasLasAristas()) {
             int x1 = posiciones[arista.origen][0];
             int y1 = posiciones[arista.origen][1];
@@ -85,6 +71,7 @@ public class GrafoGUI extends JFrame {
             g2d.setStroke(new BasicStroke(1.5f));
             dibujarFlecha(g2d, x1, y1, x2, y2);
 
+            // poner la distancia en la mitad de la arista
             int mx = (x1 + x2) / 2;
             int my = (y1 + y2) / 2;
             g2d.setColor(Color.DARK_GRAY);
@@ -92,7 +79,7 @@ public class GrafoGUI extends JFrame {
             g2d.drawString("d=" + arista.distancia, mx - 10, my - 5);
         }
 
-        // === 2. Dibujar camino Dijkstra (AZUL) ===
+        // camino de dijkstra en azul
         if (caminoDijkstra != null && caminoDijkstra.size() > 1) {
             g2d.setColor(new Color(0, 100, 255));
             g2d.setStroke(new BasicStroke(3.0f));
@@ -104,7 +91,7 @@ public class GrafoGUI extends JFrame {
             }
         }
 
-        // === 3. Dibujar camino Bellman-Ford (ROJO punteado) ===
+        // camino de bellman-ford en rojo punteado
         if (caminoBellmanFord != null && caminoBellmanFord.size() > 1) {
             g2d.setColor(new Color(220, 50, 50));
             g2d.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
@@ -117,73 +104,77 @@ public class GrafoGUI extends JFrame {
             }
         }
 
-        // === 4. Dibujar nodos ===
+        // dibujar los nodos como circulos
         g2d.setStroke(new BasicStroke(2.0f));
         int radioNodo = 25;
         for (int i = 0; i < n; i++) {
             int x = posiciones[i][0];
             int y = posiciones[i][1];
 
+            // cambiar color segun si esta en algun camino
             boolean enDijkstra = caminoDijkstra != null && caminoDijkstra.contains(i);
             boolean enBellman = caminoBellmanFord != null && caminoBellmanFord.contains(i);
 
             if (enDijkstra && enBellman) {
-                g2d.setColor(new Color(180, 100, 255));
+                g2d.setColor(new Color(180, 100, 255)); // morado si esta en los dos
             } else if (enDijkstra) {
-                g2d.setColor(new Color(100, 180, 255));
+                g2d.setColor(new Color(100, 180, 255)); // azul claro
             } else if (enBellman) {
-                g2d.setColor(new Color(255, 150, 150));
+                g2d.setColor(new Color(255, 150, 150)); // rojo claro
             } else {
-                g2d.setColor(new Color(240, 240, 240));
+                g2d.setColor(new Color(240, 240, 240)); // gris
             }
 
             g2d.fillOval(x - radioNodo, y - radioNodo, radioNodo * 2, radioNodo * 2);
             g2d.setColor(Color.BLACK);
             g2d.drawOval(x - radioNodo, y - radioNodo, radioNodo * 2, radioNodo * 2);
 
+            // numero del nodo
             g2d.setFont(new Font("Arial", Font.BOLD, 14));
             FontMetrics fm = g2d.getFontMetrics();
             String label = String.valueOf(i);
             g2d.drawString(label, x - fm.stringWidth(label) / 2, y + 5);
 
+            // victimas abajo del nodo
             g2d.setFont(new Font("Arial", Font.PLAIN, 10));
             String vicLabel = "v=" + grafo.getVictimasEnNodo(i);
             g2d.setColor(new Color(150, 0, 0));
             g2d.drawString(vicLabel, x - fm.stringWidth(vicLabel) / 2 - 2, y + radioNodo + 15);
         }
 
-        // === 5. Leyenda ===
+        // leyenda abajo
         g2d.setStroke(new BasicStroke(1.0f));
         int leyendaY = 580;
         g2d.setFont(new Font("Arial", Font.BOLD, 13));
         g2d.setColor(Color.BLACK);
         g2d.drawString("=== LEYENDA ===", 50, leyendaY);
 
+        // linea azul de dijkstra
         g2d.setColor(new Color(0, 100, 255));
         g2d.setStroke(new BasicStroke(3.0f));
         g2d.drawLine(50, leyendaY + 20, 90, leyendaY + 20);
         g2d.setColor(Color.BLACK);
         g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-        g2d.drawString("Dijkstra (Camino más corto) — Dist: " + distDijkstra
-                + " | Víctimas: " + victDijkstra, 100, leyendaY + 25);
+        g2d.drawString("Dijkstra (Camino mas corto) - Dist: " + distDijkstra
+                + " | Victimas: " + victDijkstra, 100, leyendaY + 25);
 
+        // linea roja de bellman-ford
         g2d.setColor(new Color(220, 50, 50));
         g2d.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
                 10.0f, new float[]{10.0f, 5.0f}, 0.0f));
         g2d.drawLine(50, leyendaY + 45, 90, leyendaY + 45);
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(1.0f));
-        g2d.drawString("Bellman-Ford (Más víctimas) — Dist: " + distBellman
-                + " | Víctimas: " + victBellman, 100, leyendaY + 50);
+        g2d.drawString("Bellman-Ford (Mas victimas) - Dist: " + distBellman
+                + " | Victimas: " + victBellman, 100, leyendaY + 50);
     }
 
-    /**
-     * Dibuja una flecha desde (x1,y1) hasta (x2,y2).
-     */
+    // metodo para dibujar una flecha de un punto a otro
     private void dibujarFlecha(Graphics2D g2d, int x1, int y1, int x2, int y2) {
         int radioNodo = 25;
         double angulo = Math.atan2(y2 - y1, x2 - x1);
 
+        // ajustar para que la flecha empiece y termine en el borde del nodo
         int xFin = (int) (x2 - radioNodo * Math.cos(angulo));
         int yFin = (int) (y2 - radioNodo * Math.sin(angulo));
         int xInicio = (int) (x1 + radioNodo * Math.cos(angulo));
@@ -191,6 +182,7 @@ public class GrafoGUI extends JFrame {
 
         g2d.drawLine(xInicio, yInicio, xFin, yFin);
 
+        // dibujar la punta de la flecha
         int flechaTam = 12;
         double angFlecha = Math.toRadians(25);
         int xFlecha1 = (int) (xFin - flechaTam * Math.cos(angulo - angFlecha));

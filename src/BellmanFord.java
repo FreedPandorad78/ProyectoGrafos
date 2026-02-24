@@ -1,14 +1,7 @@
 import java.util.*;
 
-/**
- * Implementación adaptada del algoritmo de Bellman-Ford.
- * En lugar de buscar el camino más corto, busca el camino que
- * MAXIMIZA la cantidad de víctimas recolectadas desde origen hasta destino.
- *
- * Adaptación: Se niegan los pesos de víctimas para convertir el problema
- * de maximización en uno de minimización (Bellman-Ford estándar minimiza).
- * Las víctimas de un nodo solo se cuentan la primera vez que se visita.
- */
+// Bellman-Ford adaptado para encontrar el camino que maximiza victimas
+// La idea es que en vez de buscar la distancia minima, buscamos las victimas maximas
 public class BellmanFord {
 
     private Grafo grafo;
@@ -17,45 +10,40 @@ public class BellmanFord {
         this.grafo = grafo;
     }
 
-    /**
-     * Ejecuta Bellman-Ford adaptado para maximizar víctimas.
-     * @param origen  Nodo de partida
-     * @param destino Nodo de llegada (guarida)
-     * @return Un arreglo con: [0] = lista de nodos del camino,
-     *         [1] = distancia total, [2] = víctimas recolectadas
-     */
+    // Ejecuta el algoritmo y devuelve el camino, distancia y victimas
     public Object[] ejecutar(int origen, int destino) {
         int n = grafo.getNumNodos();
         List<Grafo.Arista> aristas = grafo.getTodasLasAristas();
 
-        // maxVictimas[i] = máxima cantidad de víctimas acumuladas para llegar al nodo i
+        // En vez de distancia minima guardamos victimas maximas
+        // Empieza en -infinito porque no hemos llegado a ningun nodo
         int[] maxVictimas = new int[n];
         Arrays.fill(maxVictimas, Integer.MIN_VALUE);
-        // El nodo origen tiene sus propias víctimas como valor inicial
+        // El nodo origen empieza con sus propias victimas
         maxVictimas[origen] = grafo.getVictimasEnNodo(origen);
 
-        // predecesor[i] = nodo anterior en el mejor camino hacia i
+        // Para reconstruir el camino al final
         int[] predecesor = new int[n];
         Arrays.fill(predecesor, -1);
 
-        // distanciaAcumulada[i] = distancia total del camino elegido hasta el nodo i
+        // Tambien guardamos la distancia acumulada del camino que elegimos
         int[] distanciaAcumulada = new int[n];
         Arrays.fill(distanciaAcumulada, 0);
 
-        // Relajación de aristas (n-1 iteraciones, como Bellman-Ford estándar)
+        // Relajacion de aristas, se repite n-1 veces como dice el algoritmo
         for (int i = 0; i < n - 1; i++) {
             boolean huboCambio = false;
             for (Grafo.Arista arista : aristas) {
                 int u = arista.origen;
                 int v = arista.destino;
 
-                // Solo procesamos si el nodo origen ya fue alcanzado
+                // Solo si ya llegamos al nodo u
                 if (maxVictimas[u] == Integer.MIN_VALUE) continue;
 
-                // Calcular las víctimas que se obtendrían al ir a v desde u
+                // Ver cuantas victimas tendriamos si vamos a v por este camino
                 int victimasNuevas = maxVictimas[u] + arista.victimas;
 
-                // Si obtenemos MÁS víctimas por este camino, actualizamos
+                // Si por este camino hay mas victimas, lo actualizamos
                 if (victimasNuevas > maxVictimas[v]) {
                     maxVictimas[v] = victimasNuevas;
                     predecesor[v] = u;
@@ -63,14 +51,13 @@ public class BellmanFord {
                     huboCambio = true;
                 }
             }
-            // Si no hubo cambios, terminamos antes
+            // Si ya no cambia nada, no tiene sentido seguir
             if (!huboCambio) break;
         }
 
-        // Reconstruir el camino
+        // Armar el camino con los predecesores
         List<Integer> camino = new ArrayList<>();
 
-        // Si no se puede llegar al destino
         if (maxVictimas[destino] == Integer.MIN_VALUE) {
             return new Object[]{camino, -1, 0};
         }
@@ -82,7 +69,7 @@ public class BellmanFord {
         }
         Collections.reverse(camino);
 
-        // Recalcular víctimas del camino (solo primera visita a cada nodo)
+        // Contar victimas reales del camino (solo la primera vez que visitamos cada nodo)
         int totalVictimas = 0;
         Set<Integer> visitados = new HashSet<>();
         for (int nodoVisitado : camino) {
