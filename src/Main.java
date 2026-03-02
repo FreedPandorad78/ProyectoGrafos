@@ -1,6 +1,5 @@
 import java.util.*;
 
-// Clase principal - lee el grafo desde consola y ejecuta los dos algoritmos
 public class Main {
 
     public static void main(String[] args) {

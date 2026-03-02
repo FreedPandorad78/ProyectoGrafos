@@ -72,11 +72,11 @@ public class Dijkstra {
 
         // Contar las victimas del camino, solo se cuentan una vez por nodo
         int totalVictimas = 0;
-        Set<Integer> visitadosVictimas = new HashSet<>();
+        boolean[] visitadosVictimas = new boolean[n];
         for (int n2 : camino) {
-            if (!visitadosVictimas.contains(n2)) {
+            if (!visitadosVictimas[n2]) {
                 totalVictimas += grafo.getVictimasEnNodo(n2);
-                visitadosVictimas.add(n2);
+                visitadosVictimas[n2] = true;
             }
         }
 

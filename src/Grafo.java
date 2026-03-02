@@ -4,7 +4,6 @@ import java.util.List;
 // Clase para representar el grafo con lista de adyacencia
 public class Grafo {
 
-    // Cada arista tiene origen, destino, distancia y victimas
     public static class Arista {
         int origen;
         int destino;
@@ -45,7 +44,6 @@ public class Grafo {
         victimasEnNodo[v] = c;
     }
 
-    // Getters para acceder a los datos desde las otras clases
 
     public int getNumNodos() {
         return numNodos;

@@ -1,7 +1,6 @@
 import java.util.*;
 
 // Bellman-Ford adaptado para encontrar el camino que maximiza victimas
-// La idea es que en vez de buscar la distancia minima, buscamos las victimas maximas
 public class BellmanFord {
 
     private Grafo grafo;
@@ -71,11 +70,11 @@ public class BellmanFord {
 
         // Contar victimas reales del camino (solo la primera vez que visitamos cada nodo)
         int totalVictimas = 0;
-        Set<Integer> visitados = new HashSet<>();
+        boolean[] visitados = new boolean[n];
         for (int nodoVisitado : camino) {
-            if (!visitados.contains(nodoVisitado)) {
+            if (!visitados[nodoVisitado]) {
                 totalVictimas += grafo.getVictimasEnNodo(nodoVisitado);
-                visitados.add(nodoVisitado);
+                visitados[nodoVisitado] = true;
             }
         }
 
