@@ -3,7 +3,6 @@
 ## Miembros del grupo
 - Juan Pablo Londoño
 - David Orozco
-- Jerónimo Arango
 
 ## Descripcion
 Programa en Java que resuelve el problema del Ritual de JohlodejVe usando dos algoritmos de grafos:
